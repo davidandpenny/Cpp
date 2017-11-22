@@ -1,3 +1,6 @@
+#ifndef META_TYPE_TRAITS_H
+#define META_TYPE_TRAITS_H
+
 #include <type_traits>
 
 // Extensions to std.
@@ -43,3 +46,5 @@ template <>
 struct is_character<const wchar_t&> : std::true_type {};
 
 } // Std
+
+#endif // META_TYPE_TRAITS_H

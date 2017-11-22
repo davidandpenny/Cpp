@@ -1,3 +1,6 @@
+#ifndef META_STRING_H
+#define META_STRING_H
+
 #include "TypeTraits.h"
 
 #include <cstddef> // for size_t.
@@ -60,3 +63,4 @@ constexpr auto
 
 } // Meta
 
+#endif // META_STRING_H

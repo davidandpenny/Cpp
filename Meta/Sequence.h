@@ -1,3 +1,6 @@
+#ifndef META_SEQUENCE_H
+#define META_SEQUENCE_H
+
 #include <cstddef> // for size_t.
 #include <type_traits>
 
@@ -148,3 +151,4 @@ constexpr bool
 
 } // Meta
 
+#endif // META_SEQUENCE_H

@@ -2,7 +2,7 @@
 
 namespace Meta {
 
-// flag.
+namespace flag_tests {
 
 //Struct::flag; -- "‘flag’ is not a member of ‘Meta::Struct’"
 
@@ -73,4 +73,31 @@ namespace Meta {
   using DisabledUser = Clear_enabled<User>;
   static_assert(User::enabled, "user is no longer enabled");
   static_assert(!DisabledUser::super_user, "user still can't jump");
+
+} // flag_tests.
+
+namespace value_tests {
+
+//Struct::value; -- "‘value’ is not a member of ‘Meta::Struct’"
+
+// Simple setting.
+  static_assert(Set_value<>::value == 0, "default value set");
+  static_assert(Set_value<Struct, 42>::value == 42, "value set");
+
+// Resetting.
+  static_assert(Set_value<Set_value<>, 66>::value == 66, "value updated");
+  static_assert(Set_value<Set_value<Struct, 42>>::value == 0, "value reset");
+
+// Adding
+//Add_value<Struct, 1>; -- "‘value’ is not a member of ‘Meta::Struct’"
+  static_assert(Add_value<Set_value<>, 1>::value == 1,
+      "adding 1 to zero");
+  static_assert(Add_value<Add_value<Set_value<>, 1>, 1>::value == 2,
+      "adding 1 to zero twice");
+  static_assert(Add_value<Add_value<Add_value<Set_value<>, 1>, 1>, 1>::value
+      == 3, "now we're counting");
+
+
+} // value_tests
+
 }

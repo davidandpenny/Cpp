@@ -1,3 +1,6 @@
+#ifndef META_STRUCT_H
+#define META_STRUCT_H
+
 // #include <cstddef> // for size_t.
 // #include <type_traits>
 
@@ -12,53 +15,65 @@ namespace Meta {
 
 struct Struct {};
 
+namespace details {
+
+} // namespace details
+
+template <class Base = Struct, bool init = true>
+struct Set_flag : Base
+{
+  static constexpr bool flag = init;
+};
+
+template <class Base = Struct>
+struct Clear_flag : Set_flag<Base, false>
+{};
+
+template <class Base>
+struct Toggle_flag : Base
+{
+  static constexpr bool flag = !Base::flag;
+};
+
+template <class Base, bool value>
+struct AndEq_flag : Base
+{
+  static constexpr bool flag = value & Base::flag;
+};
+
+template <class Base, bool value>
+struct OrEq_flag : Base
+{
+  static constexpr bool flag = value | Base::flag;
+};
+
+} // Meta
+
 #define PP_CAT(a, b) PP_CCAT(a, b)
 #define PP_CCAT(a, b) a ## b
 
-#define META_MAKE_FLAG(member)                                          \
-  template <class Base = Struct, bool init = true>                      \
-  struct PP_CAT(Set_, member) : Base                                    \
-  {                                                                     \
-    static constexpr bool member = init;                                \
-  };                                                                    \
-                                                                        \
-  template <class Base = Struct>                                        \
-  struct PP_CAT(Clear_, member) : PP_CAT(Set_,member)<Base, false>      \
-  {};                                                                   \
-                                                                        \
-  template <class Base>                                                 \
-  struct PP_CAT(Toggle_, member) : Base                                 \
-  {                                                                     \
-    static constexpr bool member = !Base::member;                       \
-  };                                                                    \
-                                                                        \
-  template <class Base, bool value>                                     \
-  struct PP_CAT(AndEq_, member) : Base                                  \
-  {                                                                     \
-    static constexpr bool member = value & Base::member;                \
-  };                                                                    \
-                                                                        \
-  template <class Base, bool value>                                     \
-  struct PP_CAT(OrEq_, member) : Base                                   \
-  {                                                                     \
-    static constexpr bool member = value | Base::member;                \
-  };                                                                    \
-                                                                        \
-  template <class Base, bool value>                                     \
-  struct PP_CAT(XorEq_, member) : Base                                  \
-  {                                                                     \
-    static constexpr bool member = value ^ Base::member;                \
-  };
 
-// Create sample templates for:
-//   
-//   Set_flag<class Base = Struct, bool init = true> 
-//   Clear_flag<class Base = Struct>
-//   Toggle_flag<class Base>
-//   AndEq_flag<class Base, bool value>
-//   OrEq_flag<class Base, bool value>
-//   XorEq_flag<class Base, bool value>
+#define MAKE_META_FLAG(member) \
+template <class Base = Struct, bool init = true> \
+struct Set_flag : Base \
+{ \
+  static constexpr bool flag = init; \
+}; \
+ \
+template <class Base = Struct> \
+struct Clear_flag : Set_flag<Base, false> \
+{}; \
+ \
+template <class Base, bool value> \
+struct AndEq_flag : Base \
+{ \
+  static constexpr bool flag = value & Base::flag; \
+}; \
+ \
+template <class Base, bool value> \
+struct OrEq_flag : Base \
+{ \
+  static constexpr bool flag = value | Base::flag; \
+};
 
-META_MAKE_FLAG(flag)
-
-}
+#endif // META_STRUCT_H
