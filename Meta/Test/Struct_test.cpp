@@ -57,8 +57,9 @@ namespace flag_tests {
   static_assert(XorEq_flag<Set_flag<>, false>::flag,
       "true ^ false flag set");
 
-  META_MAKE_FLAG(enabled)
-  META_MAKE_FLAG(super_user)
+  META_MAKE_BOOL(enabled)
+
+  META_MAKE_BOOL(super_user)
 
   // Model a compile-time struct equivalent to:
   //   struct User { bool enabled{true}; bool super_user{false}; };
@@ -96,6 +97,15 @@ namespace value_tests {
       "adding 1 to zero twice");
   static_assert(Add_value<Add_value<Add_value<Set_value<>, 1>, 1>, 1>::value
       == 3, "now we're counting");
+
+// Subtracting
+//Subtract_value<Struct, 1>; -- "‘value’ is not a member of ‘Meta::Struct’"
+  static_assert(Subtract_value<Set_value<>, 1>::value == -1,
+      "subtracting 1 from zero");
+  static_assert(Subtract_value<Subtract_value<Set_value<>, 1>, 1>::value == -2,
+      "subtracting 1 from zero twice");
+  static_assert(Subtract_value<Subtract_value<Set_value<Struct,2>, 1>, 1>::value
+      == 0, "counting down");
 
 
 } // value_tests

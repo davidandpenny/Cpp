@@ -1,8 +1,11 @@
 #ifndef META_STRUCT_H
 #define META_STRUCT_H
 
-// #include <cstddef> // for size_t.
-// #include <type_traits>
+
+#define PP_CAT(a, b) PP_CCAT(a, b)
+#define PP_CCAT(a, b) a ## b
+
+
 
 namespace Meta {
 
@@ -15,65 +18,75 @@ namespace Meta {
 
 struct Struct {};
 
-namespace details {
+// Create templates to introduce/set/clear/invert/and/or/xor a boolean member.
 
-} // namespace details
-
-template <class Base = Struct, bool init = true>
-struct Set_flag : Base
-{
-  static constexpr bool flag = init;
+#define META_MAKE_BOOL(member)                                          \
+template <class Base = Struct, bool init = true>                        \
+struct PP_CAT(Set_,member) : Base                                       \
+{                                                                       \
+  static constexpr bool member {init};                                  \
+};                                                                      \
+                                                                        \
+template <class Base = Struct>                                          \
+struct PP_CAT(Clear_, member) : PP_CAT(Set_, member)<Base, false>       \
+{};                                                                     \
+                                                                        \
+template <class Base>                                                   \
+struct PP_CAT(Toggle_, member) : Base                                   \
+{                                                                       \
+  static constexpr bool member = !Base::member;                         \
+};                                                                      \
+                                                                        \
+template <class Base, bool value>                                       \
+struct PP_CAT(AndEq_, member) : Base                                    \
+{                                                                       \
+  static constexpr bool member = Base::member & value;                  \
+};                                                                      \
+                                                                        \
+template <class Base, bool value>                                       \
+struct PP_CAT(OrEq_, member) : Base                                     \
+{                                                                       \
+  static constexpr bool member = Base::member | value;                  \
+};                                                                      \
+                                                                        \
+template <class Base, bool value>                                       \
+struct PP_CAT(XorEq_, member) : Base                                    \
+{                                                                       \
+  static constexpr bool member = Base::member ^ value;                  \
 };
 
-template <class Base = Struct>
-struct Clear_flag : Set_flag<Base, false>
-{};
+// Create templates to introduce/set/add/subtract an integer member.
+// Uses long long ints so they shouldn't overflow.
 
-template <class Base>
-struct Toggle_flag : Base
-{
-  static constexpr bool flag = !Base::flag;
+#define META_MAKE_INTEGER(member)                                       \
+template <class Base = Struct, long long int init = 0>                  \
+struct PP_CAT(Set_,member) : Base                                       \
+{                                                                       \
+  static constexpr long long int member {init};                         \
+};                                                                      \
+                                                                        \
+template <class Base>                                                   \
+struct PP_CAT(Toggle_, member) : Base                                   \
+{                                                                       \
+  static constexpr long long int member = !Base::member;                \
+};                                                                      \
+                                                                        \
+template <class Base, long long int addend>                             \
+struct PP_CAT(Add_, member) : Base                                      \
+{                                                                       \
+  static constexpr long long int member = Base::member + addend;        \
+};                                                                      \
+                                                                        \
+template <class Base, long long int subtrahend>                         \
+struct PP_CAT(Subtract_, member) : Base                                 \
+{                                                                       \
+  static constexpr long long int member = Base::member - subtrahend;    \
 };
 
-template <class Base, bool value>
-struct AndEq_flag : Base
-{
-  static constexpr bool flag = value & Base::flag;
-};
-
-template <class Base, bool value>
-struct OrEq_flag : Base
-{
-  static constexpr bool flag = value | Base::flag;
-};
+// Exemplary flag member adder.
+META_MAKE_BOOL(flag)
+META_MAKE_INTEGER(value)
 
 } // Meta
-
-#define PP_CAT(a, b) PP_CCAT(a, b)
-#define PP_CCAT(a, b) a ## b
-
-
-#define MAKE_META_FLAG(member) \
-template <class Base = Struct, bool init = true> \
-struct Set_flag : Base \
-{ \
-  static constexpr bool flag = init; \
-}; \
- \
-template <class Base = Struct> \
-struct Clear_flag : Set_flag<Base, false> \
-{}; \
- \
-template <class Base, bool value> \
-struct AndEq_flag : Base \
-{ \
-  static constexpr bool flag = value & Base::flag; \
-}; \
- \
-template <class Base, bool value> \
-struct OrEq_flag : Base \
-{ \
-  static constexpr bool flag = value | Base::flag; \
-};
 
 #endif // META_STRUCT_H

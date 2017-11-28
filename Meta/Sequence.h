@@ -8,12 +8,19 @@ namespace Meta {
 
 using std::size_t;
 
-// Sequence is a linear compiletime container of types, essentially a deque.
+// Sequence is a compiletime linear container of types, essentially a deque.
 // It cannot hold values directly, but can hold types such as String<'h', 'i'>,
 // Int<42>, or Char<'x'>.
 
 template <typename... Ts>
 struct Sequence;
+// Specialization declarations: zero, one, many.
+template <>
+struct Sequence<>;
+template <typename T>
+struct Sequence<T>;
+template <typename T, typename... Rest>
+struct Sequence<T, Rest...>;
 
 namespace details {
 
@@ -25,6 +32,9 @@ namespace details {
 
   template <typename Out, typename... Ts>
   struct SequenceBackPopper;
+
+  template <typename Out, typename... Ts>
+  struct SequenceReverser;
 
   template <typename... Ts>
   struct SequenceBase
@@ -48,6 +58,8 @@ namespace details {
 
     template <size_t N>
     using get = typename SequenceGetter<N, Ts...>::get;
+
+    using reverse = typename SequenceReverser<Sequence<>, Ts...>::type;
   };
 
   template <typename... Ts_1, typename... Ts_2>
@@ -94,6 +106,19 @@ namespace details {
   struct SequenceBackPopper<Sequence<Fronts...>, Back>
   {
     using type = Sequence<Fronts...>;
+  };
+
+  template <typename...Outs, typename T, typename... Rest>
+  struct SequenceReverser<Sequence<Outs...>, T, Rest...>
+  {
+    using type = typename
+      SequenceReverser<Sequence<Outs..., T>, Rest...>::type;
+  };
+
+  template <typename... Outs>
+  struct SequenceReverser<Sequence<Outs...>>
+  {
+    using type = Sequence<Outs...>;
   };
 } // namespace details
 

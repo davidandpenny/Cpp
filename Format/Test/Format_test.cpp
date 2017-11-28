@@ -23,6 +23,14 @@ static_assert("abc"_Fmt == Sequence<S("abc")>{}, "");
 
 static_assert("{{abc}}"_Fmt == Sequence<S("{abc}")>{}, "");
 
+static_assert("{}abc{}"_Fmt == // wrong!
+    Sequence<S(""), S("*"), S("abc"), S("*"), S("")>{}, "");
+
+static_assert("{}abc{}"_Fmt == // right, but fails.
+    Sequence<S("*"), S("abc"), S("*")>{}, "");
+
+static_assert("x{}abc{}y"_Fmt ==
+    Sequence<S("y"), S("*"), S("abc"), S("*"), S("x")>{}, "");
 
 // Wide char formats
 static_assert(is_same<Formatter<wchar_t>, Sequence<String<wchar_t>>>(), "");

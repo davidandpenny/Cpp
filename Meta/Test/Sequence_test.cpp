@@ -122,4 +122,10 @@ namespace {
   static_assert(is_same<one::back, int>(), "unary sequence back matches");
   static_assert(is_same<i12::back, int>(), "binary sequence back matches");
   static_assert(abc::back{} == i12{}, "tertiary sequence back matches");
+
+// reverse()
+  static_assert(nul::reverse::is<nul>(), "null sequence reverses identity");
+  static_assert(is_same<one::back, int>(), "unary sequence back matches");
+  static_assert(is_same<i12::back, int>(), "binary sequence back matches");
+  static_assert(abc::back{} == i12{}, "tertiary sequence back matches");
 }
