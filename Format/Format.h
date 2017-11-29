@@ -64,7 +64,7 @@ struct CloseEscaper;
 
 // "{}" => "%"
 template <typename C, typename Out, C... ins>
-struct OpenParameter;
+struct AddParameter;
 
 } // details
 
@@ -102,15 +102,15 @@ struct Parser<wchar_t, Sequence<String<wchar_t, outs...>, Ts...>, L'}', L'}',
                           ins...>
 {};
 
-// "{}" => "%" (temporary)
+// "{}" => "*" (temporary)
 template <char... outs, char... ins, typename... Ts>
 struct Parser<char, Sequence<String<char, outs...>, Ts...>, '{', '}', ins...>
-  : details::OpenParameter<char, Sequence<String<char, outs...>, Ts...>, ins...>
+  : details::AddParameter<char, Sequence<String<char, outs...>, Ts...>, ins...>
 {};
 template <wchar_t... outs, wchar_t... ins, typename... Ts>
 struct Parser<wchar_t, Sequence<String<wchar_t, outs...>, Ts...>, L'{', L'}',
   ins...>
-  : details::OpenParameter<wchar_t, Sequence<String<wchar_t, outs...>, Ts...>,
+  : details::AddParameter<wchar_t, Sequence<String<wchar_t, outs...>, Ts...>,
                          ins...>
 {};
 
@@ -134,10 +134,38 @@ struct CloseEscaper<C, Sequence<String<C, outs...>, Ts...>, ins...> {
     typename Parser<C, Sequence<String<C, outs..., C{'}'}>, Ts...>, ins...>::parsed;
 };
 
+// "{}" => "*" (temporary)
 template <typename C, C... outs, C... ins, typename... Ts>
-struct OpenParameter<C, Sequence<String<C, outs...>, Ts...>, ins...> {
-  using parsed =
-    typename Parser<C, Sequence<String<C>, String<C, C{'*'}>, String<C, outs...>, Ts...>, ins...>::parsed;
+struct AddParameter<C, Sequence<String<C, outs...>, Ts...>, ins...> {
+  using parsed = typename
+    Parser<C,
+           Sequence<String<C>, String<C, C{'*'}>, String<C, outs...>, Ts...>,
+           ins...>::parsed;
+};
+
+// Trim leading empty string.
+template <typename C, C... ins, typename... Ts>
+struct AddParameter<C, Sequence<String<C>, Ts...>, ins...> {
+  using parsed = typename
+    Parser<C,
+           Sequence<String<C>, String<C, C{'*'}>, Ts...>,
+           ins...>::parsed;
+};
+
+// Trim trailing empty string.
+template <typename C, C... outs, typename... Ts>
+struct AddParameter<C, Sequence<String<C, outs...>, Ts...>> {
+  using parsed = typename
+    Parser<C,
+           Sequence<String<C, C{'*'}>, String<C, outs...>, Ts...>>::parsed;
+};
+
+// Trim leading and trailing empty string.
+template <typename C, typename... Ts>
+struct AddParameter<C, Sequence<String<C>, Ts...>> {
+  using parsed = typename
+    Parser<C,
+           Sequence<String<C, C{'*'}>, Ts...>>::parsed;
 };
 
 } // details
