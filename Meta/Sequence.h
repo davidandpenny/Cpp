@@ -112,9 +112,10 @@ namespace details {
   struct SequenceReverser<Sequence<Outs...>, T, Rest...>
   {
     using type = typename
-      SequenceReverser<Sequence<Outs..., T>, Rest...>::type;
+      SequenceReverser<Sequence<T, Outs...>, Rest...>::type;
   };
 
+  // Drop wrapper when no inputs
   template <typename... Outs>
   struct SequenceReverser<Sequence<Outs...>>
   {

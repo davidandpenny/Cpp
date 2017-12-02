@@ -151,7 +151,7 @@ struct Parser<wchar_t, Index,
 // No more characters: yield the Format sequence.
 template <typename C, typename Index, C... outs, typename... Ts>
 struct Parser<C, Index, Sequence<String<C, outs...>, Ts...>> {
-  using parsed = Sequence<String<C, outs...>, Ts...>;
+  using parsed = typename Sequence<String<C, outs...>, Ts...>::reverse;
 };
 
 namespace details {

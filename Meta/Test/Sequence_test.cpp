@@ -13,6 +13,9 @@ namespace {
   using i12 = Sequence<char, int>;
   using abc = Sequence<nul, one, i12>;
 
+  using i21 = Sequence<int, char>;
+  using cba = Sequence<i12, one, nul>;
+
 // is<>
   static_assert(nul::is<Sequence<>>(), "type match");
   static_assert(one::is<Sequence<int>>(), "type match");
@@ -32,8 +35,8 @@ namespace {
   static_assert(abc{} == Sequence<nul, one, i12>{}, "equal");
 
 // !=
-  static_assert(nul{} != Sequence<int>{}, "not equal");
-  static_assert(one{} != Sequence<char, int>{}, "not equal");
+  static_assert(nul{} != one{}, "not equal");
+  static_assert(one{} != i12{}, "not equal");
   static_assert(i12{} != one{}, "not equal");
   static_assert(abc{} != i12{}, "not equal");
 
@@ -125,7 +128,7 @@ namespace {
 
 // reverse()
   static_assert(nul::reverse::is<nul>(), "null sequence reverses identity");
-  static_assert(is_same<one::back, int>(), "unary sequence back matches");
-  static_assert(is_same<i12::back, int>(), "binary sequence back matches");
-  static_assert(abc::back{} == i12{}, "tertiary sequence back matches");
+  static_assert(one::reverse{} == one{}, "unary sequence reverses identity");
+  static_assert(i12::reverse{} == i21{}, "binary sequence reverses ok");
+  static_assert(abc::reverse{} == cba{}, "tertiary sequence reverses ok");
 }
