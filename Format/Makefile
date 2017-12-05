@@ -6,10 +6,10 @@
 #
 
 # define the C compiler to use
-CPP = g++
+CPP = g++-7
 
 # define any compile-time flags
-CPPFLAGS = -Wall -O3 -std=c++1y
+CPPFLAGS = -Wall -O3 -std=c++17 -fconcepts
 
 # define any directories containing header files other than /usr/include
 #

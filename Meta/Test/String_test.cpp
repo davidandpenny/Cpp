@@ -7,6 +7,9 @@ using Meta::operator""_S;
 
 namespace {
 
+// Concept failure.
+//using Bad = String<int>;
+
 // Sample strings.
   using nul = String<char>;
   using abc = String<char, 'a', 'b', 'c'>;

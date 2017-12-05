@@ -10,7 +10,7 @@ namespace Meta {
 // A compiletime string, conveniently constructable by "hello world"_S.
 // (use decltype"x"_S) to get the String type.
 // Needs push_back, pop_front, etc.
-template <typename C, C... chars> // C is a Char
+template <Character C, C... chars> // C is a Char
 struct String
 {
   using type = String<C, chars...>;
@@ -21,7 +21,7 @@ struct String
   }
 };
 
-template<typename C, C... chars>
+template<Character C, C... chars>
 constexpr auto operator""_S()
 {
   static_assert(Std::is_character<C>::value, "Strings must be characters");
@@ -29,7 +29,7 @@ constexpr auto operator""_S()
   return String<C, chars...>{};
 }
 
-template<typename C1, C1... chars_1, typename C2, C2... chars_2>
+template<Character C1, C1... chars_1, Character C2, C2... chars_2>
 constexpr bool
   operator==(const String<C1, chars_1...>& s1, const String<C2, chars_2...>& s2)
 {
@@ -38,7 +38,7 @@ constexpr bool
   return false;
 }
 
-template<typename C, C... chars_1, C... chars_2>
+template<Character C, C... chars_1, C... chars_2>
 constexpr bool
   operator==(const String<C, chars_1...>& s1, const String<C, chars_2...>& s2)
 {
@@ -47,14 +47,14 @@ constexpr bool
   return s1.template is<S2>();
 }
 
-template<typename C, C... chars_1, C... chars_2>
+template<Character C, C... chars_1, C... chars_2>
 constexpr bool
   operator!=(const String<C, chars_1...>& s1, const String<C, chars_2...>& s2)
 {
   return !(s1 == s2);
 }
 
-template<typename C, C... chars_1, C... chars_2>
+template<Character C, C... chars_1, C... chars_2>
 constexpr auto
   operator+(const String<C, chars_1...>& s1, const String<C, chars_2...>& s2)
 {
