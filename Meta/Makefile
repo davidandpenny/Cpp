@@ -27,6 +27,7 @@ LIBS =
 
 # define the C++ source files
 SRCS  = main.cpp
+SRCS += Test/RefTuple_test.cpp
 SRCS += Test/Sequence_test.cpp
 SRCS += Test/String_test.cpp
 SRCS += Test/Struct_test.cpp
@@ -99,7 +100,7 @@ main.o: /usr/include/c++/4.9.4/bits/predefined_ops.h
 main.o: /usr/include/c++/4.9.4/bits/localefwd.h /usr/include/c++/4.9.4/cctype
 main.o: /usr/include/ctype.h /usr/include/features.h
 main.o: /usr/include/stdc-predef.h /usr/include/endian.h
-main.o: /usr/include/c++/4.9.4/bits/ios_base.h
+main.o: /usr/include/xlocale.h /usr/include/c++/4.9.4/bits/ios_base.h
 main.o: /usr/include/c++/4.9.4/ext/atomicity.h
 main.o: /usr/include/c++/4.9.4/bits/locale_classes.h
 main.o: /usr/include/c++/4.9.4/string /usr/include/c++/4.9.4/bits/allocator.h
@@ -122,6 +123,10 @@ main.o: /usr/include/c++/4.9.4/bits/basic_ios.tcc
 main.o: /usr/include/c++/4.9.4/bits/ostream.tcc
 main.o: /usr/include/c++/4.9.4/istream
 main.o: /usr/include/c++/4.9.4/bits/istream.tcc
+Test/RefTuple_test.o: RefTuple.h TypeTraits.h
+Test/RefTuple_test.o: /usr/include/c++/4.9.4/type_traits
+Test/RefTuple_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
+Test/RefTuple_test.o: /usr/include/c++/4.9.4/cstddef
 Test/Sequence_test.o: Sequence.h /usr/include/c++/4.9.4/cstddef
 Test/Sequence_test.o: /usr/include/c++/4.9.4/type_traits
 Test/Sequence_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
@@ -130,6 +135,7 @@ Test/String_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
 Test/String_test.o: /usr/include/c++/4.9.4/cstddef
 Test/String_test.o: /usr/include/c++/4.9.4/cstring /usr/include/string.h
 Test/String_test.o: /usr/include/features.h /usr/include/stdc-predef.h
+Test/String_test.o: /usr/include/xlocale.h
 Test/Struct_test.o: Struct.h
 Test/TypeTraits_test.o: TypeTraits.h /usr/include/c++/4.9.4/type_traits
 Test/TypeTraits_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h

@@ -45,9 +45,12 @@ struct is_character<wchar_t&> : std::true_type {};
 template <>
 struct is_character<const wchar_t&> : std::true_type {};
 
+template <typename T>
+inline constexpr bool is_character_v = is_character<T>::value;
+
 } // Std
 
 template <typename T>
-concept bool Character = Std::is_character<T>::value;
+concept bool Character = Std::is_character_v<T>;
 
 #endif // META_TYPE_TRAITS_H

@@ -10,7 +10,7 @@ namespace Meta {
 // A compiletime string, conveniently constructable by "hello world"_S.
 // (use decltype"x"_S) to get the String type.
 // Needs push_back, pop_front, etc.
-template <Character C, C... chars> // C is a Char
+template <Character C, C... chars>
 struct String
 {
   using type = String<C, chars...>;
@@ -21,19 +21,21 @@ struct String
   }
 };
 
+inline namespace literals {
+
 template<Character C, C... chars>
 constexpr auto operator""_S()
 {
-  static_assert(Std::is_character<C>::value, "Strings must be characters");
-
   return String<C, chars...>{};
 }
+
+} // namespace literals
 
 template<Character C1, C1... chars_1, Character C2, C2... chars_2>
 constexpr bool
   operator==(const String<C1, chars_1...>& s1, const String<C2, chars_2...>& s2)
 {
-  static_assert(C1{} != C1{}, "Mismatched types in String compare");
+  static_assert(C1{} != C1{}, "Mismatched Character types in String compare");
 
   return false;
 }
