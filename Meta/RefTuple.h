@@ -49,16 +49,19 @@ constexpr auto TagString<chars...>::operator=(const T& item) const
 template <typename... Types>
 class RefTuple;
 
+template <typename... Types>
+class RefTupleBase;
+
 template <typename First, typename... Rest>
-class RefTuple<First, Rest...>
-  : private RefTuple<Rest...>
+class RefTupleBase<First, Rest...>
+  : public RefTuple<Rest...>
 {
   public:
-    constexpr RefTuple(const First& first, const Rest&... rest)
+    constexpr RefTupleBase(const First& first, const Rest&... rest)
       : RefTuple<Rest...>{rest...}
-      , item(first)
+      , item{first}
     {}
-
+    
     const First& item;
 
     template <size_t N>
@@ -68,6 +71,35 @@ class RefTuple<First, Rest...>
     rest() const {
       return static_cast<const RefTuple<Rest...>&>(*this);
     }
+};
+
+
+
+template <typename First, typename... Rest>
+class RefTuple<First, Rest...>
+  : public RefTupleBase<First, Rest...>
+{
+  public:
+    constexpr RefTuple(const First& first, const Rest&... rest)
+      : RefTupleBase<First, Rest...>{first, rest...}
+    {}
+
+    using tag = void;
+};
+
+template <Tag FirstTag, typename First, typename... Rest>
+class RefTuple<Tagged<FirstTag, First>, Rest...>
+  : public RefTuple<Rest...>
+{
+  public:
+
+    using TF = Tagged<FirstTag, First>;
+
+    constexpr RefTuple(const TF& first, const Rest&... rest)
+      : RefTupleBase<First, Rest...>{rest...}
+    {}
+
+    using tag = FirstTag;
 };
 
 template <>
@@ -91,7 +123,8 @@ namespace details {
   template <size_t N, typename First, typename... Rest>
   struct RefTupleGetHelper
   {
-    static constexpr const auto& get(const RefTuple<First, Rest...>& tuple) {
+    static constexpr const auto& get(
+        const RefTupleBase<First, Rest...>& tuple) {
       return RefTupleGetHelper<N-1, Rest...>::get(tuple.rest());
     }
   };
@@ -99,7 +132,8 @@ namespace details {
   template <typename First, typename... Rest>
   struct RefTupleGetHelper<0, First, Rest...>
   {
-    static constexpr const First& get(const RefTuple<First, Rest...>& tuple) {
+    static constexpr const First& get(
+        const RefTupleBase<First, Rest...>& tuple) {
       return tuple.item;
     }
   };
@@ -109,11 +143,36 @@ namespace details {
     static_assert(N < sizeof...(Ts), "get subscript out of bounds");
   };
 
+  template <Tag Target, typename... Ts>
+  struct RefTupleFinder;
+
+  template <Tag Target, typename First, typename... Rest>
+  struct RefTupleFinder<Target, First, Rest...>
+  {
+    static constexpr const auto& get(const RefTuple<First, Rest...>& tuple) {
+      return RefTupleFinder<Target, Rest...>::get(tuple.rest());
+    }
+  };
+
+  template <Tag Target, typename First, typename... Rest>
+  struct RefTupleFinder<Target, Tagged<Target, First>, Rest...>
+  {
+    static constexpr const First& find(const RefTuple<First, Rest...>& tuple) {
+      return tuple.item;
+    }
+  };
+
+  template <Tag Target>
+  struct RefTupleFinder<Target>
+  {
+    static_assert(sizeof(Target) == 0, "Target not Found in RefTuple");
+  };
+
 } // namespace details
 
 template <typename First, typename... Rest>
 template <size_t N>
-constexpr const auto& RefTuple<First, Rest...>::get() const {
+constexpr const auto& RefTupleBase<First, Rest...>::get() const {
   return details::RefTupleGetter<N, First, Rest...>::get(*this);
 }
 
