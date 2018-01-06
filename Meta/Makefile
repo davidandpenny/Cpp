@@ -27,10 +27,11 @@ LIBS =
 
 # define the C++ source files
 SRCS  = main.cpp
-SRCS += Test/RefTuple_test.cpp
+SRCS += Test/ForwardTuple_test.cpp
 SRCS += Test/Sequence_test.cpp
 SRCS += Test/String_test.cpp
 SRCS += Test/Struct_test.cpp
+SRCS += Test/Tag_test.cpp
 SRCS += Test/TypeTraits_test.cpp
 
 # define the C object files 
@@ -123,10 +124,10 @@ main.o: /usr/include/c++/4.9.4/bits/basic_ios.tcc
 main.o: /usr/include/c++/4.9.4/bits/ostream.tcc
 main.o: /usr/include/c++/4.9.4/istream
 main.o: /usr/include/c++/4.9.4/bits/istream.tcc
-Test/RefTuple_test.o: RefTuple.h TypeTraits.h
-Test/RefTuple_test.o: /usr/include/c++/4.9.4/type_traits
-Test/RefTuple_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
-Test/RefTuple_test.o: /usr/include/c++/4.9.4/cstddef
+Test/ForwardTuple_test.o: ForwardTuple.h Tag.h TypeTraits.h
+Test/ForwardTuple_test.o: /usr/include/c++/4.9.4/type_traits
+Test/ForwardTuple_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
+Test/ForwardTuple_test.o: /usr/include/c++/4.9.4/cstddef
 Test/Sequence_test.o: Sequence.h /usr/include/c++/4.9.4/cstddef
 Test/Sequence_test.o: /usr/include/c++/4.9.4/type_traits
 Test/Sequence_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
