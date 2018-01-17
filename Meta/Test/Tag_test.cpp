@@ -2,12 +2,11 @@
 
 using namespace Meta::literals;
 
-namespace Tag_test {
+namespace TaggedInt_test {
 
-  constexpr int y { 66 };
+  constexpr int y {42};
 
   constexpr auto z {"first"_a = y};
-//constexpr auto zz {"first"_a = 1}; // TODO
   constexpr auto q {z.item};
 
   static_assert(std::is_same<decltype(q), const int>::value, "tagged an int");
@@ -15,4 +14,16 @@ namespace Tag_test {
   using Tag = decltype(z)::Tag;
   static_assert(Tag{} == "first"_a);
   static_assert(!(Tag{} == "second"_a));
+
+  static_assert(q == 42);
+}
+
+namespace TaggedIntRvalue_test {
+
+//constexpr auto z {"first"_a = 66}; // non-constexpr.
+  constexpr auto q {("first"_a = 66).item};
+
+  static_assert(std::is_same<decltype(q), const int>::value, "tagged an int");
+
+  static_assert(q == 66);
 }

@@ -68,7 +68,7 @@ $(MAIN): $(OBJS)
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -c $<  -o $@
 
 clean:
-	$(RM) *.o *~ $(MAIN)
+	$(RM) *.o *~ Test/*.o $(MAIN)
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) -I/usr/include/c++/4.9.4 -- $(CPPFLAGS) -- $^
@@ -138,6 +138,8 @@ Test/String_test.o: /usr/include/c++/4.9.4/cstring /usr/include/string.h
 Test/String_test.o: /usr/include/features.h /usr/include/stdc-predef.h
 Test/String_test.o: /usr/include/xlocale.h
 Test/Struct_test.o: Struct.h
+Test/Tag_test.o: Tag.h TypeTraits.h /usr/include/c++/4.9.4/type_traits
+Test/Tag_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
 Test/TypeTraits_test.o: TypeTraits.h /usr/include/c++/4.9.4/type_traits
 Test/TypeTraits_test.o: /usr/include/c++/4.9.4/bits/c++0x_warning.h
 Test/TypeTraits_test.o: /usr/include/c++/4.9.4/cstdint

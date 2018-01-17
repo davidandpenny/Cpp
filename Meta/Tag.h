@@ -12,7 +12,6 @@
 //   TagStrings are compiletime strings with a UDL `_a` that can Tag a variable
 //   (reference) by the assignment operator, e.g. `"mytag"_a=42`.
 
-
 namespace Meta {
 
 template <typename T>
@@ -34,6 +33,9 @@ constexpr auto operator""_a();
 
 } // namespace literals
 
+
+// Implementation
+
 inline namespace details {
 
   struct TagBase {};
@@ -47,7 +49,7 @@ concept bool Tag = std::is_base_of_v<TagBase, T>;
 template <Character C, C... chars>
 struct TagString : TagBase {
   template <typename T>
-  constexpr auto operator=(const T& item) const;
+  constexpr auto operator=(T&& item) const;
 
   template <typename U>
   static constexpr bool is() {
@@ -94,9 +96,9 @@ constexpr bool operator==(
 
 template <Character C, C... chars>
 template <typename T>
-constexpr auto TagString<C, chars...>::operator=(const T& item) const
+constexpr auto TagString<C, chars...>::operator=(T&& item) const
 {
-  return TaggedItem<TagString<C, chars...>, T>{item};
+  return TaggedItem<TagString<C, chars...>, T&&>{item};
 }
 
 template<Character C, C... chars_1, C... chars_2>

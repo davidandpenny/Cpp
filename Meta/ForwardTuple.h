@@ -30,7 +30,7 @@ struct ForwardTupleBase<First, Rest...>
     : ForwardTuple<Rest...>{rest...}
     , item{first}
   {}
-  
+
   const First& item;
 
   template <size_t N>
@@ -68,7 +68,7 @@ struct ForwardTuple<TaggedItem<FirstTag, First>, Rest...>
 
   template <Tag T>
   constexpr const auto& find(T) const;
-  
+
   using tag = FirstTag;
 };
 
