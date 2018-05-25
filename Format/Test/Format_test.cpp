@@ -33,9 +33,42 @@ static_assert("{{{}}}"_Fmt == Sequence<S("{"), Printer<0>, S("}")>{},
     "OK");
 
 static_assert("x{}abc{}y"_Fmt ==
-    Sequence<S("x"),  Printer<0>, S("abc"),  Printer<1>, S("y")>{}, "OK");
+    Sequence<S("x"), Printer<0>, S("abc"),  Printer<1>, S("y")>{}, "OK");
 
+static_assert("x{:}abc{:}y"_Fmt ==
+    Sequence<S("x"), Printer<0>, S("abc"),  Printer<1>, S("y")>{}, "OK");
+
+auto x = "{:S"_Fmt;
+
+static_assert(is_same<decltype("x{:S"_Fmt)::get<0>, S("x")>(), "OK");
+static_assert(is_same<decltype("x{:S"_Fmt)::get<1>, Printer<0>>(), "OK");
+static_assert(is_same<decltype("x{:S"_Fmt)::get<2>, S("")>(), "OK");
+
+static_assert("x{:S"_Fmt == Sequence<S("x"), Printer<0>, S("")>{}, "OK");
+//    Sequence<Printer<0>>{}, "OK"); //!!!
+
+#if 0
+static_assert("x{}abc{SPQR}y"_Fmt ==
+    Sequence<S("x"), Printer<0>, S("abc{SPQR}y")>{}, "OK"); //!!!
+#endif
+
+#if 0
+// Indexed formats
+static_assert("x{0:}abc{1:}y"_Fmt ==
+//  Sequence<S("x"), Printer<0>, S("abc"),  Printer<1>, S("y")>{}, "OK");
+    Sequence<S("x{0:}abc{1:}y")>{}, "OK");
+#endif
+
+#if 0
+static_assert("x{1:}abc{0:}y"_Fmt ==
+//  Sequence<S("x"), Printer<1>, S("abc"),  Printer<0>, S("y")>{}, "OK");
+    Sequence<S("x{1:}abc{0:}y")>{}, "OK");
+#endif
+
+#if 0
 // Wide char formats
+
+// Trivial formats
 static_assert(is_same<Formatter<wchar_t>, Sequence<String<wchar_t>>>(), "OK");
 static_assert(Formatter<wchar_t>{} == Sequence<S(L"")>{}, "OK");
 
@@ -56,4 +89,16 @@ static_assert(L"{{{}}}"_Fmt == Sequence<S(L"{"), Printer<0>, S(L"}")>{}, "OK");
 
 static_assert(L"x{}abc{}y"_Fmt ==
     Sequence<S(L"x"), Printer<0>, S(L"abc"), Printer<1>, S(L"y")>{}, "OK");
+
+// Indexed formats
+static_assert(L"x{0:}abc{1:}y"_Fmt ==
+//  Sequence<S(L"x"), Printer<0>, S(L"abc"),  Printer<1>, S(L"y")>{}, "OK");
+    Sequence<S(L"x{0:}abc{1:}y")>{}, "OK");
+
+static_assert(L"x{1:}abc{0:}y"_Fmt ==
+//  Sequence<S(L"x"), Printer<1>, S(L"abc"),  Printer<0>, S(L"y")>{}, "OK");
+    Sequence<S(L"x{1:}abc{0:}y")>{}, "OK");
+
+#endif
+
 }

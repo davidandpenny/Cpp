@@ -39,39 +39,29 @@ struct Printer;
 template <Character C, typename Index, C... outs, C in, C... ins, typename... Ts>
 struct Parser<C, Index, Sequence<String<C, outs...>, Ts...>, in, ins...>;
 
-// "?" => "?"
-template <Character C, typename Index, C... outs, C in, C... ins, typename... Ts>
-struct Parser<C, Index, Sequence<String<C, outs...>, Ts...>, in, ins...>;
-
 // "{{" => "{"
 template <typename Index, char... outs, char... ins, typename... Ts>
 struct Parser<char, Index,
               Sequence<String<char, outs...>, Ts...>,
               '{', '{', ins...>;
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'{', L'{', ins...>;
 
 // "}}" => "}"
 template <typename Index, char... outs, char... ins, typename... Ts>
 struct Parser<char, Index,
               Sequence<String<char, outs...>, Ts...>,
               '}', '}', ins...>;
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'}', L'}', ins...>;
 
-// "{}" => "*" (temporary)
+// "{}" => Printer<Index> (special case)
 template <typename Index, char... outs, char... ins, typename... Ts>
 struct Parser<char, Index,
               Sequence<String<char, outs...>, Ts...>,
               '{', '}', ins...>;
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'{', L'}', ins...>;
+
+// "{?" => Printer<?> (temporary)
+template <typename Index, char... outs, char... ins, char in, typename... Ts>
+struct Parser<char, Index,
+              Sequence<String<char, outs...>, Ts...>,
+              '{', in, ins...>;
 
 namespace details {
 
@@ -83,8 +73,12 @@ struct OpenEscaper;
 template <Character C, typename Index, typename Out, C... ins>
 struct CloseEscaper;
 
-// "{}" => "*"
+// "{}" => Printer<Index>
 template <Character C, typename Index, typename Out, C... ins>
+struct EmptyParameter;
+
+// "{?" => Printer<?>
+template <Character C, typename Index, typename Out, typename Parm, C... ins>
 struct AddParameter;
 
 } // details
@@ -110,14 +104,6 @@ struct Parser<char, Index,
                          Sequence<String<char, outs...>, Ts...>,
                          ins...>
 {};
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'{', L'{', ins...>
-  : details::OpenEscaper<wchar_t, Index,
-                         Sequence<String<wchar_t, outs...>, Ts...>,
-                         ins...>
-{};
 
 // "}}" => "}"
 template <typename Index, char... outs, char... ins, typename... Ts>
@@ -128,32 +114,40 @@ struct Parser<char, Index,
                           Sequence<String<char, outs...>, Ts...>,
                           ins...>
 {};
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'}', L'}', ins...>
-  : details::CloseEscaper<wchar_t, Index,
-                          Sequence<String<wchar_t, outs...>, Ts...>,
-                          ins...>
-{};
 
-// "{}" => Printer<Index> (temporary)
+// "{}" => Printer<Index> (special case)
 template <typename Index, char... outs, char... ins, typename... Ts>
 struct Parser<char, Index,
               Sequence<String<char, outs...>, Ts...>,
               '{', '}', ins...>
+  : details::EmptyParameter<char, Index,
+                            Sequence<String<char, outs...>, Ts...>,
+                            ins...>
+{};
+
+// "{:}" => Printer<Index> (special case)
+template <typename Index, char... outs, char... ins, typename... Ts>
+struct Parser<char, Index,
+              Sequence<String<char, outs...>, Ts...>,
+              '{', ':', '}', ins...>
+  : details::EmptyParameter<char, Index,
+                            Sequence<String<char, outs...>, Ts...>,
+                            ins...>
+{};
+
+
+// "{:?" => Printer<?> (WIP)
+template <typename Index, char... outs, char in, char... ins, typename... Ts>
+struct Parser<char, Index,
+              Sequence<String<char, outs...>, Ts...>,
+              '{', ':', in, ins...>
   : details::AddParameter<char, Index,
                           Sequence<String<char, outs...>, Ts...>,
+                          String<char, in>,
                           ins...>
 {};
-template <typename Index, wchar_t... outs, wchar_t... ins, typename... Ts>
-struct Parser<wchar_t, Index,
-              Sequence<String<wchar_t, outs...>, Ts...>,
-              L'{', L'}', ins...>
-  : details::AddParameter<wchar_t, Index,
-                          Sequence<String<wchar_t, outs...>, Ts...>,
-                          ins...>
-{};
+
+
 
 // No more characters: yield the Format sequence.
 template <Character C, typename Index, typename... Ts>
@@ -185,9 +179,22 @@ struct CloseEscaper<C, Index,
 
 // "{}" => Printer<Index> (temporary)
 template <Character C, typename Index, C... outs, C... ins, typename... Ts>
+struct EmptyParameter<C, Index,
+                      Sequence<String<C, outs...>, Ts...>,
+                      ins...> {
+  using parsed = typename
+    Parser<C, Add_index<Index, 1>,
+           Sequence<String<C>, Printer<Index::index>, String<C, outs...>, Ts...>,
+           ins...>::parsed;
+};
+
+// "{:..." => Printer<Index> (WIP)
+template <Character C, typename Index, C... outs, C... ins, C... parms,
+          typename... Ts>
 struct AddParameter<C, Index,
-                    Sequence<String<C, outs...>, Ts...>,
-                    ins...> {
+                      Sequence<String<C, outs...>, Ts...>,
+                      String<C, parms...>,
+                      ins...> {
   using parsed = typename
     Parser<C, Add_index<Index, 1>,
            Sequence<String<C>, Printer<Index::index>, String<C, outs...>, Ts...>,
@@ -196,7 +203,7 @@ struct AddParameter<C, Index,
 
 // Trim leading empty string.
 template <Character C, typename Index, C... ins, typename... Ts>
-struct AddParameter<C, Index, Sequence<String<C>, Ts...>, ins...> {
+struct EmptyParameter<C, Index, Sequence<String<C>, Ts...>, ins...> {
   using parsed = typename
     Parser<C, Add_index<Index, 1>,
            Sequence<String<C>, Printer<Index::index>, Ts...>,
@@ -205,7 +212,7 @@ struct AddParameter<C, Index, Sequence<String<C>, Ts...>, ins...> {
 
 // Trim trailing empty string.
 template <Character C, typename Index, C... outs, typename... Ts>
-struct AddParameter<C, Index, Sequence<String<C, outs...>, Ts...>> {
+struct EmptyParameter<C, Index, Sequence<String<C, outs...>, Ts...>> {
   using parsed = typename
     Parser<C, Add_index<Index, 1>,
            Sequence<Printer<Index::index>, String<C, outs...>, Ts...>>::parsed;
@@ -213,7 +220,7 @@ struct AddParameter<C, Index, Sequence<String<C, outs...>, Ts...>> {
 
 // Trim leading and trailing empty string.
 template <Character C, typename Index, typename... Ts>
-struct AddParameter<C, Index, Sequence<String<C>, Ts...>> {
+struct EmptyParameter<C, Index, Sequence<String<C>, Ts...>> {
   using parsed = typename
     Parser<C, Add_index<Index, 1>,
            Sequence<Printer<Index::index>, Ts...>>::parsed;
